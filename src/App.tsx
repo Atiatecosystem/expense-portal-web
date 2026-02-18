@@ -13,6 +13,8 @@ import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import Dashboard from "@/pages/Dashboard";
+import CreateRequest from "@/pages/CreateRequest";
+import SettingsPage from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,14 +44,14 @@ const AppRoutes = () => (
       }
     >
       <Route index element={<Dashboard />} />
-      {/* Placeholder routes — pages will be implemented in subsequent phases */}
       <Route path="requests" element={<Dashboard />} />
+      <Route path="requests/new" element={<CreateRequest />} />
       <Route path="notifications" element={<Dashboard />} />
       <Route path="analytics" element={<Dashboard />} />
       <Route path="users" element={<Dashboard />} />
       <Route path="organizations" element={<Dashboard />} />
       <Route path="payments" element={<Dashboard />} />
-      <Route path="settings" element={<Dashboard />} />
+      <Route path="settings" element={<SettingsPage />} />
     </Route>
 
     <Route path="*" element={<NotFound />} />

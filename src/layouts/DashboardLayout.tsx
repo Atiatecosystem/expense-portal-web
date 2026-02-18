@@ -11,16 +11,18 @@ import {
   Settings,
   LogOut,
   Menu,
-  Search,
   Sun,
   Moon,
   ChevronLeft,
   Building2,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
+import { useOrganization } from "@/contexts/OrganizationContext";
 import { cn } from "@/lib/utils";
 import { UserRole } from "@/types";
 import {
@@ -29,6 +31,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 
 const navItems = [
@@ -45,6 +48,7 @@ const navItems = [
 const DashboardLayout = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useSettings();
+  const { organizations, currentOrg, switchOrg } = useOrganization();
   const navigate = useNavigate();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
@@ -73,25 +77,22 @@ const DashboardLayout = () => {
 
       {/* Nav */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4" role="navigation" aria-label="Main navigation">
-        {visibleNav.map((item) => {
-          const active = location.pathname === item.url;
-          return (
-            <NavLink
-              key={item.url}
-              to={item.url}
-              end={item.url === "/dashboard"}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              )}
-              activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
-              onClick={() => setMobileOpen(false)}
-            >
-              <item.icon className="h-4 w-4 shrink-0" />
-              {!collapsed && <span>{item.title}</span>}
-            </NavLink>
-          );
-        })}
+        {visibleNav.map((item) => (
+          <NavLink
+            key={item.url}
+            to={item.url}
+            end={item.url === "/dashboard"}
+            className={cn(
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+              "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+            )}
+            activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+            onClick={() => setMobileOpen(false)}
+          >
+            <item.icon className="h-4 w-4 shrink-0" />
+            {!collapsed && <span>{item.title}</span>}
+          </NavLink>
+        ))}
       </nav>
 
       {/* Bottom */}
@@ -126,7 +127,6 @@ const DashboardLayout = () => {
         )}
       >
         <SidebarContent />
-        {/* Collapse toggle (desktop only) */}
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="absolute -right-3 top-20 hidden h-6 w-6 items-center justify-center rounded-full border bg-card text-muted-foreground shadow-sm hover:text-foreground lg:flex"
@@ -149,6 +149,43 @@ const DashboardLayout = () => {
           </h2>
 
           <div className="ml-auto flex items-center gap-2">
+            {/* Organization Switcher */}
+            {organizations.length > 1 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2 text-xs">
+                    <Building className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">{currentOrg.name}</span>
+                    <ChevronDown className="h-3 w-3 opacity-60" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">
+                    Switch Organization
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {organizations.map((org) => (
+                    <DropdownMenuItem
+                      key={org.id}
+                      onClick={() => switchOrg(org.id)}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-7 w-7 items-center justify-center rounded bg-primary/10 text-xs font-bold text-primary">
+                          {org.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">{org.name}</p>
+                          <p className="text-xs text-muted-foreground">{org.userCount} members</p>
+                        </div>
+                      </div>
+                      {currentOrg.id === org.id && <Check className="h-4 w-4 text-primary" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
             {/* Theme toggle */}
             <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
               {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
