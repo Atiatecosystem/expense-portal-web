@@ -1,0 +1,193 @@
+import { useState } from "react";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  FileText,
+  Bell,
+  BarChart3,
+  Users,
+  Building,
+  CreditCard,
+  Settings,
+  LogOut,
+  Menu,
+  Search,
+  Sun,
+  Moon,
+  ChevronLeft,
+  Building2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { NavLink } from "@/components/NavLink";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSettings } from "@/contexts/SettingsContext";
+import { cn } from "@/lib/utils";
+import { UserRole } from "@/types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const navItems = [
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: "all" as const },
+  { title: "My Requests", url: "/dashboard/requests", icon: FileText, roles: "all" as const },
+  { title: "Notifications", url: "/dashboard/notifications", icon: Bell, roles: "all" as const },
+  { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin] },
+  { title: "Users & Accounts", url: "/dashboard/users", icon: Users, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin] },
+  { title: "Organizations", url: "/dashboard/organizations", icon: Building, roles: [UserRole.SuperAdmin] },
+  { title: "Payments", url: "/dashboard/payments", icon: CreditCard, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin] },
+  { title: "Settings", url: "/dashboard/settings", icon: Settings, roles: "all" as const },
+];
+
+const DashboardLayout = () => {
+  const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useSettings();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const visibleNav = navItems.filter(
+    (item) => item.roles === "all" || (user && (item.roles as UserRole[]).includes(user.role))
+  );
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  const SidebarContent = () => (
+    <div className="flex h-full flex-col">
+      {/* Logo */}
+      <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary">
+          <Building2 className="h-5 w-5 text-sidebar-primary-foreground" />
+        </div>
+        {!collapsed && (
+          <span className="text-sm font-bold text-sidebar-foreground">Atiat Group</span>
+        )}
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4" role="navigation" aria-label="Main navigation">
+        {visibleNav.map((item) => {
+          const active = location.pathname === item.url;
+          return (
+            <NavLink
+              key={item.url}
+              to={item.url}
+              end={item.url === "/dashboard"}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              )}
+              activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+              onClick={() => setMobileOpen(false)}
+            >
+              <item.icon className="h-4 w-4 shrink-0" />
+              {!collapsed && <span>{item.title}</span>}
+            </NavLink>
+          );
+        })}
+      </nav>
+
+      {/* Bottom */}
+      <div className="border-t border-sidebar-border p-2">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        >
+          <LogOut className="h-4 w-4 shrink-0" />
+          {!collapsed && <span>Logout</span>}
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex min-h-screen w-full bg-background">
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar transition-all duration-300 lg:relative lg:z-auto",
+          collapsed ? "w-16" : "w-60",
+          mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+        )}
+      >
+        <SidebarContent />
+        {/* Collapse toggle (desktop only) */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="absolute -right-3 top-20 hidden h-6 w-6 items-center justify-center rounded-full border bg-card text-muted-foreground shadow-sm hover:text-foreground lg:flex"
+          aria-label="Toggle sidebar"
+        >
+          <ChevronLeft className={cn("h-3.5 w-3.5 transition-transform", collapsed && "rotate-180")} />
+        </button>
+      </aside>
+
+      {/* Main area */}
+      <div className="flex flex-1 flex-col">
+        {/* Topbar */}
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-card px-4 shadow-sm lg:px-6">
+          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)}>
+            <Menu className="h-5 w-5" />
+          </Button>
+
+          <h2 className="hidden text-sm font-semibold text-foreground sm:block">
+            Welcome To, Atiat Expense Portal
+          </h2>
+
+          <div className="ml-auto flex items-center gap-2">
+            {/* Theme toggle */}
+            <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            </Button>
+
+            {/* Notifications */}
+            <Button variant="ghost" size="icon" className="relative" onClick={() => navigate("/dashboard/notifications")}>
+              <Bell className="h-4 w-4" />
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
+            </Button>
+
+            {/* User dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="gap-2 px-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                    {user?.firstName?.[0]}
+                    {user?.lastName?.[0]}
+                  </div>
+                  <span className="hidden text-sm font-medium sm:inline">{user?.firstName} {user?.lastName}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>Profile</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>Settings</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive">Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="flex-1 p-4 lg:p-6">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default DashboardLayout;
