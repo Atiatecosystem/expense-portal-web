@@ -24,4 +24,5 @@ const StatusBadge = ({ status, className }: StatusBadgeProps) => {
   );
 };
 
+export { StatusBadge };
 export default StatusBadge;
