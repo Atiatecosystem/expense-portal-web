@@ -13,7 +13,13 @@ import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import Dashboard from "@/pages/Dashboard";
+import Requests from "@/pages/Requests";
 import CreateRequest from "@/pages/CreateRequest";
+import Notifications from "@/pages/Notifications";
+import Analytics from "@/pages/Analytics";
+import UsersPage from "@/pages/Users";
+import Organizations from "@/pages/Organizations";
+import Payments from "@/pages/Payments";
 import SettingsPage from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 
@@ -44,13 +50,13 @@ const AppRoutes = () => (
       }
     >
       <Route index element={<Dashboard />} />
-      <Route path="requests" element={<Dashboard />} />
+      <Route path="requests" element={<Requests />} />
       <Route path="requests/new" element={<CreateRequest />} />
-      <Route path="notifications" element={<Dashboard />} />
-      <Route path="analytics" element={<Dashboard />} />
-      <Route path="users" element={<Dashboard />} />
-      <Route path="organizations" element={<Dashboard />} />
-      <Route path="payments" element={<Dashboard />} />
+      <Route path="notifications" element={<Notifications />} />
+      <Route path="analytics" element={<Analytics />} />
+      <Route path="users" element={<UsersPage />} />
+      <Route path="organizations" element={<Organizations />} />
+      <Route path="payments" element={<Payments />} />
       <Route path="settings" element={<SettingsPage />} />
     </Route>
 
