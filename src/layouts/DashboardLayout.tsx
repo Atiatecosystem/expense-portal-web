@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useOrganization } from "@/contexts/OrganizationContext";
@@ -33,16 +34,17 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import CommandPalette from "@/components/CommandPalette";
 
 const navItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: "all" as const },
-  { title: "My Requests", url: "/dashboard/requests", icon: FileText, roles: "all" as const },
-  { title: "Notifications", url: "/dashboard/notifications", icon: Bell, roles: "all" as const },
-  { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin] },
-  { title: "Users & Accounts", url: "/dashboard/users", icon: Users, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin] },
-  { title: "Organizations", url: "/dashboard/organizations", icon: Building, roles: [UserRole.SuperAdmin] },
-  { title: "Payments", url: "/dashboard/payments", icon: CreditCard, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin] },
-  { title: "Settings", url: "/dashboard/settings", icon: Settings, roles: "all" as const },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: "all" as const, badge: 0 },
+  { title: "My Requests", url: "/dashboard/requests", icon: FileText, roles: "all" as const, badge: 0 },
+  { title: "Notifications", url: "/dashboard/notifications", icon: Bell, roles: "all" as const, badge: 3 },
+  { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Users & Accounts", url: "/dashboard/users", icon: Users, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Organizations", url: "/dashboard/organizations", icon: Building, roles: [UserRole.SuperAdmin], badge: 0 },
+  { title: "Payments", url: "/dashboard/payments", icon: CreditCard, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Settings", url: "/dashboard/settings", icon: Settings, roles: "all" as const, badge: 0 },
 ];
 
 const DashboardLayout = () => {
@@ -50,7 +52,6 @@ const DashboardLayout = () => {
   const { theme, toggleTheme } = useSettings();
   const { organizations, currentOrg, switchOrg } = useOrganization();
   const navigate = useNavigate();
-  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -61,6 +62,46 @@ const DashboardLayout = () => {
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  /** Single nav item — wraps in Tooltip when sidebar is collapsed */
+  const NavItem = ({ item }: { item: typeof navItems[0] }) => {
+    const link = (
+      <NavLink
+        to={item.url}
+        end={item.url === "/dashboard"}
+        className={cn(
+          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+          "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+          collapsed && "justify-center px-0",
+        )}
+        activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+        onClick={() => setMobileOpen(false)}
+      >
+        <span className="relative shrink-0">
+          <item.icon className="h-4 w-4" />
+          {item.badge > 0 && (
+            <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
+              {item.badge}
+            </span>
+          )}
+        </span>
+        {!collapsed && <span>{item.title}</span>}
+      </NavLink>
+    );
+
+    if (collapsed) {
+      return (
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>{link}</TooltipTrigger>
+          <TooltipContent side="right" className="text-xs">
+            {item.title}
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    return link;
   };
 
   const SidebarContent = () => (
@@ -78,32 +119,33 @@ const DashboardLayout = () => {
       {/* Nav */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4" role="navigation" aria-label="Main navigation">
         {visibleNav.map((item) => (
-          <NavLink
-            key={item.url}
-            to={item.url}
-            end={item.url === "/dashboard"}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-              "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-            )}
-            activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
-            onClick={() => setMobileOpen(false)}
-          >
-            <item.icon className="h-4 w-4 shrink-0" />
-            {!collapsed && <span>{item.title}</span>}
-          </NavLink>
+          <NavItem key={item.url} item={item} />
         ))}
       </nav>
 
       {/* Bottom */}
       <div className="border-t border-sidebar-border p-2">
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-        >
-          <LogOut className="h-4 w-4 shrink-0" />
-          {!collapsed && <span>Logout</span>}
-        </button>
+        {collapsed ? (
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center justify-center rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              >
+                <LogOut className="h-4 w-4 shrink-0" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right" className="text-xs">Logout</TooltipContent>
+          </Tooltip>
+        ) : (
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          >
+            <LogOut className="h-4 w-4 shrink-0" />
+            <span>Logout</span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -149,6 +191,9 @@ const DashboardLayout = () => {
           </h2>
 
           <div className="ml-auto flex items-center gap-2">
+            {/* Command Palette trigger */}
+            <CommandPalette />
+
             {/* Organization Switcher */}
             {organizations.length > 1 && (
               <DropdownMenu>

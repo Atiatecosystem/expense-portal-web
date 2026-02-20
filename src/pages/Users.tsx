@@ -5,11 +5,11 @@ import {
   UserCheck,
   UserX,
   Shield,
-  Search,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,
@@ -50,6 +50,8 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
+const PAGE_SIZE = 10;
+
 const roleLabels: Record<UserRole, string> = {
   [UserRole.SuperAdmin]: "Super Admin",
   [UserRole.OrgAdmin]: "Org Admin",
@@ -68,6 +70,7 @@ const UsersPage = () => {
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [search, setSearch] = useState("");
   const [orgFilter, setOrgFilter] = useState("all");
+  const [page, setPage] = useState(1);
   const [showCreate, setShowCreate] = useState(false);
   const [newUser, setNewUser] = useState({ firstName: "", lastName: "", email: "", role: UserRole.Employee, orgId: "" });
 
@@ -80,6 +83,9 @@ const UsersPage = () => {
       return matchSearch && matchOrg;
     });
   }, [users, search, orgFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const toggleActive = (id: string) => {
     setUsers((prev) =>
@@ -117,12 +123,12 @@ const UsersPage = () => {
 
       <FilterBar
         searchValue={search}
-        onSearchChange={setSearch}
+        onSearchChange={(v) => { setSearch(v); setPage(1); }}
         searchPlaceholder="Search users…"
         filters={[
           {
             value: orgFilter,
-            onChange: setOrgFilter,
+            onChange: (v) => { setOrgFilter(v); setPage(1); },
             options: [
               { label: "All Organizations", value: "all" },
               ...mockOrganizations.map((o) => ({ label: o.name, value: o.id })),
@@ -145,7 +151,7 @@ const UsersPage = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((user) => (
+            {paginated.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -198,6 +204,32 @@ const UsersPage = () => {
             ))}
           </TableBody>
         </Table>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between border-t px-4 py-3">
+          <p className="text-xs text-muted-foreground">
+            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="icon" className="h-8 w-8" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <Button
+                key={i}
+                variant={page === i + 1 ? "default" : "outline"}
+                size="icon"
+                className="h-8 w-8 text-xs"
+                onClick={() => setPage(i + 1)}
+              >
+                {i + 1}
+              </Button>
+            ))}
+            <Button variant="outline" size="icon" className="h-8 w-8" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Create User Dialog */}

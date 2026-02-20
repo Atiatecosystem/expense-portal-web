@@ -1,5 +1,14 @@
 import { useState, useMemo } from "react";
-import { Download, MoreHorizontal, CheckCircle2, Clock, AlertCircle, Loader2 } from "lucide-react";
+import {
+  Download,
+  MoreHorizontal,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -24,6 +33,8 @@ import { PaymentRecord } from "@/types";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
+const PAGE_SIZE = 10;
+
 const paymentStatusConfig: Record<PaymentRecord["status"], { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: React.ReactNode }> = {
   pending: { label: "Pending", variant: "outline", icon: <Clock className="h-3 w-3" /> },
   processing: { label: "Processing", variant: "secondary", icon: <Loader2 className="h-3 w-3 animate-spin" /> },
@@ -35,6 +46,7 @@ const Payments = () => {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
     return mockPayments.filter((p) => {
@@ -44,6 +56,9 @@ const Payments = () => {
       return matchSearch && matchStatus;
     });
   }, [search, statusFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) => {
@@ -55,8 +70,8 @@ const Payments = () => {
   };
 
   const toggleAll = () => {
-    if (selectedIds.size === filtered.length) setSelectedIds(new Set());
-    else setSelectedIds(new Set(filtered.map((p) => p.id)));
+    if (selectedIds.size === paginated.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(paginated.map((p) => p.id)));
   };
 
   return (
@@ -69,12 +84,12 @@ const Payments = () => {
 
       <FilterBar
         searchValue={search}
-        onSearchChange={setSearch}
+        onSearchChange={(v) => { setSearch(v); setPage(1); }}
         searchPlaceholder="Search payments…"
         filters={[
           {
             value: statusFilter,
-            onChange: setStatusFilter,
+            onChange: (v) => { setStatusFilter(v); setPage(1); },
             options: [
               { label: "All Statuses", value: "all" },
               { label: "Pending", value: "pending" },
@@ -99,7 +114,7 @@ const Payments = () => {
             <TableRow>
               <TableHead className="w-10">
                 <Checkbox
-                  checked={selectedIds.size === filtered.length && filtered.length > 0}
+                  checked={selectedIds.size === paginated.length && paginated.length > 0}
                   onCheckedChange={toggleAll}
                   aria-label="Select all"
                 />
@@ -114,7 +129,7 @@ const Payments = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((pay) => {
+            {paginated.map((pay) => {
               const cfg = paymentStatusConfig[pay.status];
               return (
                 <TableRow key={pay.id}>
@@ -157,6 +172,32 @@ const Payments = () => {
             })}
           </TableBody>
         </Table>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between border-t px-4 py-3">
+          <p className="text-xs text-muted-foreground">
+            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+          </p>
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="icon" className="h-8 w-8" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <Button
+                key={i}
+                variant={page === i + 1 ? "default" : "outline"}
+                size="icon"
+                className="h-8 w-8 text-xs"
+                onClick={() => setPage(i + 1)}
+              >
+                {i + 1}
+              </Button>
+            ))}
+            <Button variant="outline" size="icon" className="h-8 w-8" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
