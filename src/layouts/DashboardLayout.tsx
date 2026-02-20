@@ -33,6 +33,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import logoIcon from "@/assets/images/logo.png";
+import ImageRenderer from "@/components/ImageRenderer";
 
 const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: "all" as const },
@@ -67,12 +69,13 @@ const DashboardLayout = () => {
     <div className="flex h-full flex-col">
       {/* Logo */}
       <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-4">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary">
-          <Building2 className="h-5 w-5 text-sidebar-primary-foreground" />
+        <div className="flex h-9 w-auto shrink-0 items-center justify-center rounded-lg bg-sidebar-transparent">
+          {/* <Building2 className="h-5 w-5 text-sidebar-primary-foreground" /> */}
+          <ImageRenderer src={logoIcon} alt="Logo" className={cn("h-8 w-8", !collapsed && "h-8 w-auto")} />
         </div>
-        {!collapsed && (
+        {/* {!collapsed && (
           <span className="text-sm font-bold text-sidebar-foreground">Atiat Group</span>
-        )}
+        )} */}
       </div>
 
       {/* Nav */}
