@@ -1,21 +1,63 @@
 import { useState } from "react";
-import { Sun, Moon, Monitor, Bell, BellOff, Mail, MessageSquare } from "lucide-react";
+import {
+  Sun,
+  Moon,
+  Bell,
+  Mail,
+  MessageSquare,
+  User as UserIcon,
+  Shield,
+  Eye,
+  EyeOff,
+  Lock,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { useSettings } from "@/contexts/SettingsContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 type Theme = "light" | "dark";
 
-/** Settings page — Appearance + Notification preferences */
 const Settings = () => {
   const { theme, setTheme } = useSettings();
+  const { user } = useAuth();
 
-  /* ── Notification prefs (local state, mock) ── */
+  /* ── Profile state ── */
+  const [profile, setProfile] = useState({
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
+    phone: "+966 5X XXX XXXX",
+    jobTitle: "Super Admin",
+  });
+
+  const saveProfile = () => toast.success("Profile updated successfully.");
+
+  /* ── Security state ── */
+  const [security, setSecurity] = useState({ current: "", newPw: "", confirm: "" });
+  const [showPw, setShowPw] = useState(false);
+
+  const changePassword = () => {
+    if (!security.current || !security.newPw) {
+      toast.error("Please fill in all password fields.");
+      return;
+    }
+    if (security.newPw !== security.confirm) {
+      toast.error("New passwords do not match.");
+      return;
+    }
+    toast.success("Password changed successfully.");
+    setSecurity({ current: "", newPw: "", confirm: "" });
+  };
+
+  /* ── Notification prefs ── */
   const [notifPrefs, setNotifPrefs] = useState(() => {
     const saved = localStorage.getItem("atiat_notif_prefs");
     return saved
@@ -46,18 +88,148 @@ const Settings = () => {
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-        <p className="text-sm text-muted-foreground">Manage your appearance and notification preferences.</p>
+        <p className="text-sm text-muted-foreground">Manage your profile, security, appearance and notifications.</p>
       </div>
 
-      <Tabs defaultValue="appearance" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="appearance" className="gap-2">
-            <Sun className="h-4 w-4" /> Appearance
+      <Tabs defaultValue="profile" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="profile" className="gap-1.5 text-xs sm:text-sm">
+            <UserIcon className="h-3.5 w-3.5" /> Profile
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2">
-            <Bell className="h-4 w-4" /> Notifications
+          <TabsTrigger value="security" className="gap-1.5 text-xs sm:text-sm">
+            <Shield className="h-3.5 w-3.5" /> Security
+          </TabsTrigger>
+          <TabsTrigger value="appearance" className="gap-1.5 text-xs sm:text-sm">
+            <Sun className="h-3.5 w-3.5" /> Theme
+          </TabsTrigger>
+          <TabsTrigger value="notifications" className="gap-1.5 text-xs sm:text-sm">
+            <Bell className="h-3.5 w-3.5" /> Alerts
           </TabsTrigger>
         </TabsList>
+
+        {/* ── Profile Tab ── */}
+        <TabsContent value="profile" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Personal Information</CardTitle>
+              <CardDescription>Update your personal details and contact information.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>First Name</Label>
+                <Input
+                  value={profile.firstName}
+                  onChange={(e) => setProfile((p) => ({ ...p, firstName: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Last Name</Label>
+                <Input
+                  value={profile.lastName}
+                  onChange={(e) => setProfile((p) => ({ ...p, lastName: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Email</Label>
+                <Input value={profile.email} disabled className="bg-muted" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Phone</Label>
+                <Input
+                  value={profile.phone}
+                  onChange={(e) => setProfile((p) => ({ ...p, phone: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Job Title</Label>
+                <Input
+                  value={profile.jobTitle}
+                  onChange={(e) => setProfile((p) => ({ ...p, jobTitle: e.target.value }))}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Button onClick={saveProfile}>Save Changes</Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ── Security Tab ── */}
+        <TabsContent value="security" className="mt-6 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Change Password</CardTitle>
+              <CardDescription>Update your password to keep your account secure.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-1.5">
+                <Label>Current Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    type={showPw ? "text" : "password"}
+                    className="pl-10 pr-10"
+                    value={security.current}
+                    onChange={(e) => setSecurity((s) => ({ ...s, current: e.target.value }))}
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowPw(!showPw)}
+                    aria-label="Toggle password visibility"
+                  >
+                    {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label>New Password</Label>
+                  <Input
+                    type="password"
+                    value={security.newPw}
+                    onChange={(e) => setSecurity((s) => ({ ...s, newPw: e.target.value }))}
+                    placeholder="••••••••"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Confirm New Password</Label>
+                  <Input
+                    type="password"
+                    value={security.confirm}
+                    onChange={(e) => setSecurity((s) => ({ ...s, confirm: e.target.value }))}
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+              {security.newPw && security.confirm && security.newPw !== security.confirm && (
+                <p className="text-xs text-destructive">Passwords do not match.</p>
+              )}
+              <Button onClick={changePassword}>Update Password</Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Two-Factor Authentication</CardTitle>
+              <CardDescription>Add an extra layer of security to your account.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Enable 2FA</p>
+                  <p className="text-xs text-muted-foreground">Require a code from your authenticator app on login.</p>
+                </div>
+                <Switch
+                  onCheckedChange={(v) =>
+                    toast.info(v ? "2FA will be enabled — this is a mock." : "2FA disabled.")
+                  }
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* ── Appearance Tab ── */}
         <TabsContent value="appearance" className="mt-6 space-y-6">
@@ -95,11 +267,10 @@ const Settings = () => {
             </CardContent>
           </Card>
 
-          {/* Live preview mini card */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Preview</CardTitle>
-              <CardDescription>This is how cards and buttons look with your current theme.</CardDescription>
+              <CardDescription>Live preview of your current theme.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-3">
@@ -118,7 +289,6 @@ const Settings = () => {
 
         {/* ── Notifications Tab ── */}
         <TabsContent value="notifications" className="mt-6 space-y-6">
-          {/* Email notifications */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -148,7 +318,6 @@ const Settings = () => {
             </CardContent>
           </Card>
 
-          {/* Push notifications */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
