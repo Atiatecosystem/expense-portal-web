@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import ImageRenderer from "@/components/ImageRenderer";
+import logoIcon from "@/assets/images/logo.png"
 
 /** Forgot Password page */
 const ForgotPassword = () => {
@@ -28,8 +30,12 @@ const ForgotPassword = () => {
       <Card className="w-full max-w-md animate-fade-in shadow-lg">
         <CardContent className="flex flex-col gap-6 p-10">
           <div className="flex flex-col items-center gap-3 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary">
-              <Building2 className="h-7 w-7 text-primary-foreground" />
+            <div className="flex h-14 w-auto items-center justify-center rounded-xl bg-transparent">
+              <ImageRenderer
+                src={logoIcon}
+                alt="Logo"
+                className="h-7 w-7 text-primary-foreground"
+              />
             </div>
             <h1 className="text-xl font-bold text-foreground">
               {sent ? "Check Your Email" : "Forgot Password"}

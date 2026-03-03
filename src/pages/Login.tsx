@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
+import logoIcon from "@/assets/images/logo.png";
+import ImageRenderer from "@/components/ImageRenderer";
 
 /** Login page — email & password with green CTA */
 const Login = () => {
@@ -27,10 +29,11 @@ const Login = () => {
         <CardContent className="flex flex-col gap-6 p-10">
           {/* Logo */}
           <div className="flex flex-col items-center gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary">
-              <Building2 className="h-7 w-7 text-primary-foreground" />
+            <div className="flex h-14 w-auto items-center justify-center rounded-xl bg-transparent">
+              {/* <Building2 className="h-7 w-7 text-primary-foreground" /> */}
+              <ImageRenderer src={logoIcon} alt="Logo" className="h-8 w-8" />
             </div>
-            <h1 className="text-xl font-bold text-foreground">Login to Your Account</h1>
+            <h1 className="text-xl font-bold text-foreground">Welcome Back</h1>
             <p className="text-sm text-muted-foreground">Enter your credentials to continue</p>
           </div>
 
@@ -99,7 +102,7 @@ const Login = () => {
       </Card>
 
       {/* Footer */}
-      <p className="mt-6 text-xs text-muted-foreground">© 2026 Atiat Group. All rights reserved.</p>
+      <p className="mt-24 text-xs text-muted-foreground">© 2026 Atiat Group. All rights reserved.</p>
     </div>
   );
 };
