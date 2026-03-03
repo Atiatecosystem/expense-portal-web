@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import { OrganizationProvider } from "@/contexts/OrganizationContext";
+import { PermissionProvider } from "@/contexts/PermissionContext";
 import SkeletonLoader from "@/components/SkeletonLoader";
 
 /* ── Lazy-loaded route components for code splitting ── */
@@ -24,6 +25,12 @@ const UsersPage = lazy(() => import("@/pages/Users"));
 const Organizations = lazy(() => import("@/pages/Organizations"));
 const Payments = lazy(() => import("@/pages/Payments"));
 const SettingsPage = lazy(() => import("@/pages/Settings"));
+const Departments = lazy(() => import("@/pages/Departments"));
+const Workflows = lazy(() => import("@/pages/Workflows"));
+const Approvers = lazy(() => import("@/pages/Approvers"));
+const Budgets = lazy(() => import("@/pages/Budgets"));
+const Currencies = lazy(() => import("@/pages/Currencies"));
+const AuditLogs = lazy(() => import("@/pages/AuditLogs"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -71,6 +78,12 @@ const AppRoutes = () => (
         <Route path="organizations" element={<Organizations />} />
         <Route path="payments" element={<Payments />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="departments" element={<Departments />} />
+        <Route path="workflows" element={<Workflows />} />
+        <Route path="approvers" element={<Approvers />} />
+        <Route path="budgets" element={<Budgets />} />
+        <Route path="currencies" element={<Currencies />} />
+        <Route path="audit-logs" element={<AuditLogs />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
@@ -83,13 +96,15 @@ const App = () => (
     <SettingsProvider>
       <AuthProvider>
         <OrganizationProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
-          </TooltipProvider>
+          <PermissionProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </TooltipProvider>
+          </PermissionProvider>
         </OrganizationProvider>
       </AuthProvider>
     </SettingsProvider>
