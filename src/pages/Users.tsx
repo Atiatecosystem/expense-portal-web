@@ -57,6 +57,7 @@ const roleLabels: Record<UserRole, string> = {
   [UserRole.OrgAdmin]: "Org Admin",
   [UserRole.Manager]: "Manager",
   [UserRole.Employee]: "Employee",
+  [UserRole.FinanceReviewer]: "Finance Reviewer",
 };
 
 const roleColors: Record<UserRole, string> = {
@@ -64,6 +65,7 @@ const roleColors: Record<UserRole, string> = {
   [UserRole.OrgAdmin]: "bg-status-published/15 text-status-published",
   [UserRole.Manager]: "bg-status-pending/15 text-status-pending",
   [UserRole.Employee]: "bg-muted text-muted-foreground",
+  [UserRole.FinanceReviewer]: "bg-[hsl(var(--chart-4))]/15 text-[hsl(var(--chart-4))]",
 };
 
 const UsersPage = () => {

@@ -17,6 +17,12 @@ import {
   Building2,
   ChevronDown,
   Check,
+  FolderTree,
+  GitBranch,
+  UserCheck,
+  Wallet,
+  Coins,
+  ScrollText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/NavLink";
@@ -42,10 +48,16 @@ const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: "all" as const, badge: 0 },
   { title: "My Requests", url: "/dashboard/requests", icon: FileText, roles: "all" as const, badge: 0 },
   { title: "Notifications", url: "/dashboard/notifications", icon: Bell, roles: "all" as const, badge: 3 },
-  { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
+  { title: "Departments", url: "/dashboard/departments", icon: FolderTree, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Workflows", url: "/dashboard/workflows", icon: GitBranch, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Approvers", url: "/dashboard/approvers", icon: UserCheck, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Budgets", url: "/dashboard/budgets", icon: Wallet, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
   { title: "Users & Accounts", url: "/dashboard/users", icon: Users, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
   { title: "Organizations", url: "/dashboard/organizations", icon: Building, roles: [UserRole.SuperAdmin], badge: 0 },
-  { title: "Payments", url: "/dashboard/payments", icon: CreditCard, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Payments", url: "/dashboard/payments", icon: CreditCard, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
+  { title: "Currencies", url: "/dashboard/currencies", icon: Coins, roles: [UserRole.SuperAdmin], badge: 0 },
+  { title: "Audit Logs", url: "/dashboard/audit-logs", icon: ScrollText, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
   { title: "Settings", url: "/dashboard/settings", icon: Settings, roles: "all" as const, badge: 0 },
 ];
 
