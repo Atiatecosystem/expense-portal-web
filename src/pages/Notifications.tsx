@@ -24,6 +24,7 @@ const typeIcon: Record<NotificationType, React.ReactNode> = {
   [NotificationType.RequestRejected]: <XCircle className="h-4 w-4 text-status-rejected" />,
   [NotificationType.RequestComment]: <MessageSquare className="h-4 w-4 text-status-published" />,
   [NotificationType.SystemAlert]: <AlertTriangle className="h-4 w-4 text-status-pending" />,
+  [NotificationType.BudgetAlert]: <AlertTriangle className="h-4 w-4 text-status-pending" />,
 };
 
 const Notifications = () => {
