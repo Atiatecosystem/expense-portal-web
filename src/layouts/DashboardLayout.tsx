@@ -18,28 +18,33 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger, DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import CommandPalette from "@/components/CommandPalette";
 import logoIcon from "@/assets/images/logo.png";
 import ImageRenderer from "@/components/ImageRenderer";
 
 const navItems = [
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: "all" as const, badge: 0 },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
+  { title: "User Dashboard", url: "/dashboard/user", icon: LayoutDashboard, roles: [UserRole.Employee, UserRole.Manager], badge: 0 },
   { title: "My Requests", url: "/dashboard/requests", icon: FileText, roles: "all" as const, badge: 0 },
-  { title: "Notifications", url: "/dashboard/notifications", icon: Bell, roles: "all" as const, badge: 3 },
-  { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
+  // { title: "Notifications", url: "/dashboard/notifications", icon: Bell, roles: "all" as const, badge: 3 },
+  // { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
   { title: "Reports", url: "/dashboard/reports", icon: FileBarChart, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
-  { title: "Departments", url: "/dashboard/departments", icon: FolderTree, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
-  { title: "Workflows", url: "/dashboard/workflows", icon: GitBranch, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
   { title: "Approvers", url: "/dashboard/approvers", icon: UserCheck, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
-  { title: "Budgets", url: "/dashboard/budgets", icon: Wallet, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
-  { title: "Users & Accounts", url: "/dashboard/users", icon: Users, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
-  { title: "Roles", url: "/dashboard/roles", icon: Shield, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
   { title: "Organizations", url: "/dashboard/organizations", icon: Building, roles: [UserRole.SuperAdmin], badge: 0 },
-  { title: "Directors", url: "/dashboard/directors", icon: UserSquare2, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Departments", url: "/dashboard/departments", icon: FolderTree, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Budgets", url: "/dashboard/budgets", icon: Wallet, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
+  { title: "Workflows", url: "/dashboard/workflows", icon: GitBranch, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Users", url: "/dashboard/users", icon: Users, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  { title: "Roles", url: "/dashboard/roles", icon: Shield, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  // { title: "Directors", url: "/dashboard/directors", icon: UserSquare2, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
   { title: "Payments", url: "/dashboard/payments", icon: CreditCard, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
-  { title: "Currencies", url: "/dashboard/currencies", icon: Coins, roles: [UserRole.SuperAdmin], badge: 0 },
+  // { title: "Currencies", url: "/dashboard/currencies", icon: Coins, roles: [UserRole.SuperAdmin], badge: 0 },
   { title: "Audit Logs", url: "/dashboard/audit-logs", icon: ScrollText, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
-  { title: "Activity", url: "/dashboard/activity", icon: Activity, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  // { title: "Activity", url: "/dashboard/activity", icon: Activity, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
   { title: "Settings", url: "/dashboard/settings", icon: Settings, roles: "all" as const, badge: 0 },
 ];
 
@@ -50,12 +55,18 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const visibleNav = navItems.filter(
     (item) => item.roles === "all" || (user && (item.roles as UserRole[]).includes(user.role))
   );
 
-  const handleLogout = () => { logout(); navigate("/"); };
+  const handleLogout = () => setShowLogoutConfirm(true);
+  const confirmLogout = () => {
+    setShowLogoutConfirm(false);
+    logout();
+    navigate("/");
+  };
 
   const NavItem = ({ item }: { item: typeof navItems[0] }) => {
     const link = (
@@ -128,7 +139,7 @@ const DashboardLayout = () => {
         <div className="fixed inset-0 z-40 bg-foreground/20 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)} />
       )}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar transition-all duration-300 lg:relative lg:z-auto",
+        "fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar transition-all duration-300 border-r border-sidebar-border",
         collapsed ? "w-16" : "w-60",
         mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
       )}>
@@ -142,7 +153,10 @@ const DashboardLayout = () => {
         </button>
       </aside>
 
-      <div className="flex flex-1 flex-col">
+      <div className={cn(
+        "flex flex-1 flex-col transition-all duration-300",
+        collapsed ? "lg:ml-16" : "lg:ml-60"
+      )}>
         <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-card px-4 shadow-sm lg:px-6">
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)}>
             <Menu className="h-5 w-5" />
@@ -204,6 +218,23 @@ const DashboardLayout = () => {
         </header>
         <main className="flex-1 p-4 lg:p-6"><Outlet /></main>
       </div>
+
+      <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will need to sign in again to access your dashboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Log out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

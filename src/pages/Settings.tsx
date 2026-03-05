@@ -85,8 +85,9 @@ const Settings = () => {
   ];
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <div>
+    // <div className="mx-auto flex max-w-2xl flex-col gap-6">
+    <div className="mx-auto max-w-4xl pb-12">
+      <div className="mb-8 space-y-1">
         <h1 className="text-2xl font-bold text-foreground">Settings</h1>
         <p className="text-sm text-muted-foreground">Manage your profile, security, appearance and notifications.</p>
       </div>
@@ -99,9 +100,9 @@ const Settings = () => {
           <TabsTrigger value="security" className="gap-1.5 text-xs sm:text-sm">
             <Shield className="h-3.5 w-3.5" /> Security
           </TabsTrigger>
-          <TabsTrigger value="appearance" className="gap-1.5 text-xs sm:text-sm">
+          {/* <TabsTrigger value="appearance" className="gap-1.5 text-xs sm:text-sm">
             <Sun className="h-3.5 w-3.5" /> Theme
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger value="notifications" className="gap-1.5 text-xs sm:text-sm">
             <Bell className="h-3.5 w-3.5" /> Alerts
           </TabsTrigger>

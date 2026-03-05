@@ -17,12 +17,14 @@ const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const DashboardLayout = lazy(() => import("@/layouts/DashboardLayout"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const UserDashboard = lazy(() => import("@/pages/UserDashboard"));
 const Requests = lazy(() => import("@/pages/Requests"));
 const RequestDetail = lazy(() => import("@/pages/RequestDetail"));
 const CreateRequest = lazy(() => import("@/pages/CreateRequest"));
 const Notifications = lazy(() => import("@/pages/Notifications"));
 const Analytics = lazy(() => import("@/pages/Analytics"));
 const UsersPage = lazy(() => import("@/pages/Users"));
+const UserDetail = lazy(() => import("@/pages/UserDetail"));
 const Organizations = lazy(() => import("@/pages/Organizations"));
 const Payments = lazy(() => import("@/pages/Payments"));
 const SettingsPage = lazy(() => import("@/pages/Settings"));
@@ -75,12 +77,14 @@ const AppRoutes = () => (
         }
       >
         <Route index element={<Dashboard />} />
+        <Route path="user" element={<UserDashboard />} />
         <Route path="requests" element={<Requests />} />
         <Route path="requests/new" element={<CreateRequest />} />
         <Route path="requests/:id" element={<RequestDetail />} />
         <Route path="notifications" element={<Notifications />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="users/:id" element={<UserDetail />} />
         <Route path="organizations" element={<Organizations />} />
         <Route path="payments" element={<Payments />} />
         <Route path="settings" element={<SettingsPage />} />
