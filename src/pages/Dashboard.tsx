@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import {
   FileText,
   Users,
@@ -33,6 +33,7 @@ import {
   Cell,
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
+import { UserRole } from "@/types";
 import StatusBadge from "@/components/StatusBadge";
 import StatsCard from "@/components/StatsCard";
 import PageHeader from "@/components/PageHeader";
@@ -64,6 +65,10 @@ const Dashboard = () => {
         .slice(0, 5),
     []
   );
+
+  if (user?.role === UserRole.Employee || user?.role === UserRole.Manager) {
+    return <Navigate to="/dashboard/user" replace />;
+  }
 
   return (
     <div className="flex flex-col gap-6">
