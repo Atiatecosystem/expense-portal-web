@@ -192,8 +192,8 @@ const Workflows = () => {
 
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                           {step.assigneeName && <span>Assignee: {step.assigneeName}</span>}
-                          {step.minAmount != null && <span>Min: SAR {step.minAmount.toLocaleString()}</span>}
-                          {step.maxAmount != null && <span>Max: SAR {step.maxAmount.toLocaleString()}</span>}
+                          {step.minAmount != null && <span>Min: ₦ {step.minAmount.toLocaleString()}</span>}
+                          {step.maxAmount != null && <span>Max: ₦ {step.maxAmount.toLocaleString()}</span>}
                           {step.escalationHours && (
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" /> Escalation: {step.escalationHours}h

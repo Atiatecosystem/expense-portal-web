@@ -174,7 +174,7 @@ export interface CurrencyRate {
   code: string;
   name: string;
   symbol: string;
-  rateToSAR: number;
+  isActive: boolean;
   updatedAt: string;
 }
 

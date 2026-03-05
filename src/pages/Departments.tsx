@@ -195,7 +195,7 @@ const Departments = () => {
 
 /* ── Create Department Dialog ── */
 const CreateDepartmentDialog = ({ open, onOpenChange, onCreate }: { open: boolean; onOpenChange: (v: boolean) => void; onCreate: (d: Department) => void }) => {
-  const [form, setForm] = useState({ name: "", code: "", headId: "", budgetLimit: "", currency: "SAR", workflowId: "", active: true });
+  const [form, setForm] = useState({ name: "", code: "", headId: "", budgetLimit: "", currency: "NGN", workflowId: "", active: true });
   const [loading, setLoading] = useState(false);
 
   const handleCreate = async () => {
@@ -221,7 +221,7 @@ const CreateDepartmentDialog = ({ open, onOpenChange, onCreate }: { open: boolea
     onCreate(dept);
     setLoading(false);
     onOpenChange(false);
-    setForm({ name: "", code: "", headId: "", budgetLimit: "", currency: "SAR", workflowId: "", active: true });
+    setForm({ name: "", code: "", headId: "", budgetLimit: "", currency: "NGN", workflowId: "", active: true });
   };
 
   return (
@@ -256,7 +256,7 @@ const CreateDepartmentDialog = ({ open, onOpenChange, onCreate }: { open: boolea
             <Select value={form.currency} onValueChange={(v) => setForm((f) => ({ ...f, currency: v }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="SAR">SAR</SelectItem>
+                <SelectItem value="NGN">NGN</SelectItem>
                 <SelectItem value="USD">USD</SelectItem>
                 <SelectItem value="EUR">EUR</SelectItem>
               </SelectContent>

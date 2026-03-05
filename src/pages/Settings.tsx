@@ -22,6 +22,8 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { Coins } from "lucide-react";
+import CurrencySettings from "./Currencies";
 
 type Theme = "light" | "dark";
 
@@ -63,13 +65,13 @@ const Settings = () => {
     return saved
       ? JSON.parse(saved)
       : {
-          emailOnApproval: true,
-          emailOnRejection: true,
-          emailOnComment: false,
-          pushEnabled: true,
-          pushOnSubmission: true,
-          pushOnApproval: true,
-        };
+        emailOnApproval: true,
+        emailOnRejection: true,
+        emailOnComment: false,
+        pushEnabled: true,
+        pushOnSubmission: true,
+        pushOnApproval: true,
+      };
   });
 
   const updateNotif = (key: string, value: boolean) => {
@@ -93,12 +95,15 @@ const Settings = () => {
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-5">
           <TabsTrigger value="profile" className="gap-1.5 text-xs sm:text-sm">
             <UserIcon className="h-3.5 w-3.5" /> Profile
           </TabsTrigger>
           <TabsTrigger value="security" className="gap-1.5 text-xs sm:text-sm">
             <Shield className="h-3.5 w-3.5" /> Security
+          </TabsTrigger>
+          <TabsTrigger value="currencies" className="gap-1.5 text-xs sm:text-sm">
+            <Coins className="h-3.5 w-3.5" /> Currencies
           </TabsTrigger>
           {/* <TabsTrigger value="appearance" className="gap-1.5 text-xs sm:text-sm">
             <Sun className="h-3.5 w-3.5" /> Theme
@@ -230,6 +235,11 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* ── Currencies Tab ── */}
+        <TabsContent value="currencies" className="mt-6">
+          <CurrencySettings />
         </TabsContent>
 
         {/* ── Appearance Tab ── */}

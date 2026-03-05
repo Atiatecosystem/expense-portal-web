@@ -23,7 +23,7 @@ export const mockDepartments: Department[] = [
     headName: "Sara Hassan",
     budgetLimit: 150000,
     budgetUsed: 87500,
-    currency: "SAR",
+    currency: "NGN",
     workflowId: "wf1",
     workflowName: "Standard Approval",
     memberCount: 12,
@@ -39,7 +39,7 @@ export const mockDepartments: Department[] = [
     headName: "Nora Mansour",
     budgetLimit: 80000,
     budgetUsed: 72000,
-    currency: "SAR",
+    currency: "NGN",
     workflowId: "wf1",
     workflowName: "Standard Approval",
     memberCount: 8,
@@ -56,7 +56,7 @@ export const mockDepartments: Department[] = [
     headName: "Ahmed Al-Rashid",
     budgetLimit: 200000,
     budgetUsed: 45000,
-    currency: "SAR",
+    currency: "NGN",
     workflowId: "wf2",
     workflowName: "High-Value Approval",
     memberCount: 6,
@@ -72,7 +72,7 @@ export const mockDepartments: Department[] = [
     headName: "Nora Mansour",
     budgetLimit: 60000,
     budgetUsed: 18000,
-    currency: "SAR",
+    currency: "NGN",
     memberCount: 5,
     isActive: true,
     createdAt: "2025-03-01T08:00:00Z",
@@ -87,7 +87,7 @@ export const mockDepartments: Department[] = [
     headName: "Fatima Al-Saud",
     budgetLimit: 250000,
     budgetUsed: 120000,
-    currency: "SAR",
+    currency: "NGN",
     workflowId: "wf2",
     workflowName: "High-Value Approval",
     memberCount: 15,
@@ -103,7 +103,7 @@ export const mockDepartments: Department[] = [
     headName: "Fatima Al-Saud",
     budgetLimit: 100000,
     budgetUsed: 95000,
-    currency: "SAR",
+    currency: "NGN",
     memberCount: 10,
     isActive: false,
     createdAt: "2025-05-01T08:00:00Z",
@@ -116,7 +116,7 @@ export const mockWorkflows: ApprovalWorkflow[] = [
   {
     id: "wf1",
     name: "Standard Approval",
-    description: "Default workflow for expenses under SAR 10,000. Single manager approval.",
+    description: "Default workflow for expenses under NGN 10,000. Single manager approval.",
     organizationId: "org1",
     steps: [
       {
@@ -138,7 +138,7 @@ export const mockWorkflows: ApprovalWorkflow[] = [
   {
     id: "wf2",
     name: "High-Value Approval",
-    description: "Multi-level approval for expenses above SAR 10,000. Requires manager + finance director.",
+    description: "Multi-level approval for expenses above NGN 10,000. Requires manager + finance director.",
     organizationId: "org1",
     steps: [
       {
@@ -184,7 +184,7 @@ export const mockWorkflows: ApprovalWorkflow[] = [
   {
     id: "wf3",
     name: "Auto-Approve (Low Value)",
-    description: "Expenses under SAR 500 are auto-approved after submission.",
+    description: "Expenses under NGN 500 are auto-approved after submission.",
     organizationId: "org2",
     steps: [
       {
@@ -217,7 +217,7 @@ export const mockBudgets: Budget[] = [
     period: BudgetPeriod.Quarterly,
     limit: 150000,
     used: 87500,
-    currency: "SAR",
+    currency: "NGN",
     alertThreshold: 80,
     isActive: true,
     createdAt: "2026-01-01T00:00:00Z",
@@ -232,7 +232,7 @@ export const mockBudgets: Budget[] = [
     period: BudgetPeriod.Quarterly,
     limit: 80000,
     used: 72000,
-    currency: "SAR",
+    currency: "NGN",
     alertThreshold: 85,
     isActive: true,
     createdAt: "2026-01-01T00:00:00Z",
@@ -247,7 +247,7 @@ export const mockBudgets: Budget[] = [
     period: BudgetPeriod.Yearly,
     limit: 200000,
     used: 45000,
-    currency: "SAR",
+    currency: "NGN",
     alertThreshold: 90,
     isActive: true,
     createdAt: "2026-01-01T00:00:00Z",
@@ -262,7 +262,7 @@ export const mockBudgets: Budget[] = [
     period: BudgetPeriod.Monthly,
     limit: 250000,
     used: 120000,
-    currency: "SAR",
+    currency: "NGN",
     alertThreshold: 75,
     isActive: true,
     createdAt: "2026-01-01T00:00:00Z",
@@ -277,7 +277,7 @@ export const mockBudgets: Budget[] = [
     period: BudgetPeriod.Monthly,
     limit: 5000,
     used: 4300,
-    currency: "SAR",
+    currency: "NGN",
     alertThreshold: 80,
     isActive: true,
     createdAt: "2026-02-01T00:00:00Z",
@@ -287,12 +287,12 @@ export const mockBudgets: Budget[] = [
 /* ── Currency Rates ── */
 
 export const mockCurrencies: CurrencyRate[] = [
-  { id: "c1", code: "SAR", name: "Saudi Riyal", symbol: "﷼", rateToSAR: 1, updatedAt: "2026-03-01T00:00:00Z" },
-  { id: "c2", code: "USD", name: "US Dollar", symbol: "$", rateToSAR: 3.75, updatedAt: "2026-03-01T00:00:00Z" },
-  { id: "c3", code: "EUR", name: "Euro", symbol: "€", rateToSAR: 4.05, updatedAt: "2026-03-01T00:00:00Z" },
-  { id: "c4", code: "GBP", name: "British Pound", symbol: "£", rateToSAR: 4.72, updatedAt: "2026-03-01T00:00:00Z" },
-  { id: "c5", code: "AED", name: "UAE Dirham", symbol: "د.إ", rateToSAR: 1.02, updatedAt: "2026-03-01T00:00:00Z" },
-  { id: "c6", code: "KWD", name: "Kuwaiti Dinar", symbol: "د.ك", rateToSAR: 12.2, updatedAt: "2026-03-01T00:00:00Z" },
+  { id: "c1", code: "NGN", name: "Nigerian Naira", symbol: "₦", isActive: true, updatedAt: "2026-03-01T00:00:00Z" },
+  { id: "c2", code: "USD", name: "US Dollar", symbol: "$", isActive: true, updatedAt: "2026-03-01T00:00:00Z" },
+  { id: "c3", code: "EUR", name: "Euro", symbol: "€", isActive: true, updatedAt: "2026-03-01T00:00:00Z" },
+  { id: "c4", code: "GBP", name: "British Pound", symbol: "£", isActive: false, updatedAt: "2026-03-01T00:00:00Z" },
+  { id: "c5", code: "AED", name: "UAE Dirham", symbol: "د.إ", isActive: false, updatedAt: "2026-03-01T00:00:00Z" },
+  { id: "c6", code: "SAR", name: "Saudi Riyal", symbol: "﷼", isActive: false, updatedAt: "2026-03-01T00:00:00Z" },
 ];
 
 /* ── Audit Logs ── */

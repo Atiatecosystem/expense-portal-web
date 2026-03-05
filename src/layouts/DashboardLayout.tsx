@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, FileText, Bell, BarChart3, Users, Building, CreditCard,
-  Settings, LogOut, Menu, Sun, Moon, ChevronLeft, ChevronDown, Check,
+  Settings, LogOut, Menu, Sun, Moon, ChevronLeft, ChevronDown, ChevronRight, Check,
   FolderTree, GitBranch, UserCheck, Wallet, Coins, ScrollText, Shield,
   UserSquare2, FileBarChart, Activity,
 } from "lucide-react";
@@ -26,40 +26,227 @@ import CommandPalette from "@/components/CommandPalette";
 import logoIcon from "@/assets/images/logo.png";
 import ImageRenderer from "@/components/ImageRenderer";
 
-const navItems = [
+type NavItemType = {
+  title: string;
+  url: string;
+  icon: any;
+  roles: UserRole[] | "all";
+  badge: number;
+  children?: Omit<NavItemType, "children" | "icon" | "badge">[];
+};
+
+const navItems: NavItemType[] = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
   { title: "User Dashboard", url: "/dashboard/user", icon: LayoutDashboard, roles: [UserRole.Employee, UserRole.Manager], badge: 0 },
-  { title: "My Requests", url: "/dashboard/requests", icon: FileText, roles: "all" as const, badge: 0 },
-  // { title: "Notifications", url: "/dashboard/notifications", icon: Bell, roles: "all" as const, badge: 3 },
-  // { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
+  { title: "Requests", url: "/dashboard/requests", icon: FileText, roles: "all" as const, badge: 0 },
   { title: "Reports", url: "/dashboard/reports", icon: FileBarChart, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
-  { title: "Approvers", url: "/dashboard/approvers", icon: UserCheck, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
-  { title: "Organizations", url: "/dashboard/organizations", icon: Building, roles: [UserRole.SuperAdmin], badge: 0 },
-  { title: "Departments", url: "/dashboard/departments", icon: FolderTree, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
-  { title: "Budgets", url: "/dashboard/budgets", icon: Wallet, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
-  { title: "Workflows", url: "/dashboard/workflows", icon: GitBranch, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  // { title: "Approvers", url: "/dashboard/approvers", icon: UserCheck, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
+  {
+    title: "Organizations",
+    url: "/dashboard/organizations-group",
+    icon: Building,
+    roles: [UserRole.SuperAdmin, UserRole.OrgAdmin],
+    badge: 0,
+    children: [
+      { title: "Organizations", url: "/dashboard/organizations", roles: [UserRole.SuperAdmin] },
+      { title: "Departments", url: "/dashboard/departments", roles: [UserRole.SuperAdmin, UserRole.OrgAdmin] },
+      { title: "Budgets", url: "/dashboard/budgets", roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer] },
+      { title: "Workflows", url: "/dashboard/workflows", roles: [UserRole.SuperAdmin, UserRole.OrgAdmin] },
+    ]
+  },
   { title: "Users", url: "/dashboard/users", icon: Users, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
   { title: "Roles", url: "/dashboard/roles", icon: Shield, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
-  // { title: "Directors", url: "/dashboard/directors", icon: UserSquare2, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
   { title: "Payments", url: "/dashboard/payments", icon: CreditCard, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin, UserRole.FinanceReviewer], badge: 0 },
-  // { title: "Currencies", url: "/dashboard/currencies", icon: Coins, roles: [UserRole.SuperAdmin], badge: 0 },
   { title: "Audit Logs", url: "/dashboard/audit-logs", icon: ScrollText, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
-  // { title: "Activity", url: "/dashboard/activity", icon: Activity, roles: [UserRole.SuperAdmin, UserRole.OrgAdmin], badge: 0 },
   { title: "Settings", url: "/dashboard/settings", icon: Settings, roles: "all" as const, badge: 0 },
 ];
+
+type NavItemProps = {
+  item: NavItemType;
+  collapsed: boolean;
+  user: any; // Simplified for extraction
+  openSubmenus: Record<string, boolean>;
+  location: any;
+  setMobileOpen: (open: boolean) => void;
+  toggleSubmenu: (title: string) => void;
+};
+
+const NavItem = ({ item, collapsed, user, openSubmenus, location, setMobileOpen, toggleSubmenu }: NavItemProps) => {
+  const hasChildren = item.children && item.children.length > 0;
+  const isSubmenuOpen = openSubmenus[item.title];
+  const isParentActive = hasChildren && item.children?.some(child => location.pathname.startsWith(child.url));
+
+  const content = (
+    <>
+      <span className="relative shrink-0">
+        <item.icon className={cn("h-4 w-4", isParentActive && "text-primary")} />
+        {item.badge > 0 && (
+          <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
+            {item.badge}
+          </span>
+        )}
+      </span>
+      {!collapsed && (
+        <div className="flex flex-1 items-center justify-between">
+          <span className={cn(isParentActive && "font-semibold text-white")}>{item.title}</span>
+          {hasChildren && (
+            <ChevronDown className={cn("h-4 w-4 transition-transform", isSubmenuOpen && "rotate-180")} />
+          )}
+        </div>
+      )}
+    </>
+  );
+
+  const baseClasses = cn(
+    "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+    "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+    collapsed && "justify-center px-0",
+    isParentActive && !isSubmenuOpen && !collapsed && "bg-sidebar-accent/50 text-foreground"
+  );
+
+  const linkOrButton = hasChildren ? (
+    <button onClick={() => toggleSubmenu(item.title)} className={baseClasses}>
+      {content}
+    </button>
+  ) : (
+    <NavLink
+      to={item.url}
+      end={item.url === "/dashboard"}
+      className={baseClasses}
+      activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+      onClick={() => setMobileOpen(false)}
+    >
+      {content}
+    </NavLink>
+  );
+
+  if (collapsed) {
+    return (
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>{linkOrButton}</TooltipTrigger>
+        <TooltipContent side="right" className="text-xs">{item.title}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <div className="flex flex-col space-y-1">
+      {linkOrButton}
+      {hasChildren && isSubmenuOpen && !collapsed && (
+        <div className="ml-9 mt-1 flex flex-col space-y-1 border-l border-sidebar-border pl-2">
+          {item.children?.map(child => {
+            if (child.roles !== "all" && user && !(child.roles as UserRole[]).includes(user.role)) return null;
+            return (
+              <NavLink
+                key={child.url}
+                to={child.url}
+                className="flex items-center rounded-md px-3 py-2 text-sm text-white transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                activeClassName="bg-sidebar-accent/50 text-primary font-medium"
+                onClick={() => setMobileOpen(false)}
+              >
+                {child.title}
+              </NavLink>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+type SidebarContentProps = {
+  collapsed: boolean;
+  visibleNav: NavItemType[];
+  user: any;
+  openSubmenus: Record<string, boolean>;
+  location: any;
+  setMobileOpen: (open: boolean) => void;
+  toggleSubmenu: (title: string) => void;
+  handleLogout: () => void;
+};
+
+const SidebarContent = ({ collapsed, visibleNav, user, openSubmenus, location, setMobileOpen, toggleSubmenu, handleLogout }: SidebarContentProps) => (
+  <div className="flex h-full flex-col">
+    <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-4">
+      <div className="flex h-9 w-auto shrink-0 items-center justify-center rounded-lg bg-sidebar-transparent">
+        <ImageRenderer src={logoIcon} alt="Logo" className={cn("h-8 w-8", !collapsed && "h-8 w-auto")} />
+      </div>
+    </div>
+    <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4" role="navigation" aria-label="Main navigation">
+      {visibleNav.map((item) => (
+        <NavItem
+          key={item.url}
+          item={item}
+          collapsed={collapsed}
+          user={user}
+          openSubmenus={openSubmenus}
+          location={location}
+          setMobileOpen={setMobileOpen}
+          toggleSubmenu={toggleSubmenu}
+        />
+      ))}
+    </nav>
+    <div className="border-t border-sidebar-border p-2">
+      {collapsed ? (
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <button onClick={handleLogout} className="flex w-full items-center justify-center rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+              <LogOut className="h-4 w-4 shrink-0" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="text-xs">Logout</TooltipContent>
+        </Tooltip>
+      ) : (
+        <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          <LogOut className="h-4 w-4 shrink-0" /><span>Logout</span>
+        </button>
+      )}
+    </div>
+  </div>
+);
 
 const DashboardLayout = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useSettings();
   const { organizations, currentOrg, switchOrg } = useOrganization();
   const navigate = useNavigate();
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
+
+  // Auto-expand menu if a child is active initially
+  useEffect(() => {
+    const currentPath = location.pathname;
+    setOpenSubmenus(prev => {
+      let changed = false;
+      const next = { ...prev };
+      navItems.forEach(item => {
+        if (item.children?.some(child => currentPath.startsWith(child.url))) {
+          if (!next[item.title]) {
+            next[item.title] = true;
+            changed = true;
+          }
+        }
+      });
+      return changed ? next : prev;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
+  }, [location.pathname]);
 
   const visibleNav = navItems.filter(
     (item) => item.roles === "all" || (user && (item.roles as UserRole[]).includes(user.role))
   );
+
+  const toggleSubmenu = (title: string) => {
+    if (collapsed) {
+      setCollapsed(false);
+      setOpenSubmenus({ [title]: true }); // Open just this one when expanding
+    } else {
+      setOpenSubmenus(prev => ({ ...prev, [title]: !prev[title] }));
+    }
+  };
 
   const handleLogout = () => setShowLogoutConfirm(true);
   const confirmLogout = () => {
@@ -67,71 +254,6 @@ const DashboardLayout = () => {
     logout();
     navigate("/");
   };
-
-  const NavItem = ({ item }: { item: typeof navItems[0] }) => {
-    const link = (
-      <NavLink
-        to={item.url}
-        end={item.url === "/dashboard"}
-        className={cn(
-          "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-          "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-          collapsed && "justify-center px-0",
-        )}
-        activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
-        onClick={() => setMobileOpen(false)}
-      >
-        <span className="relative shrink-0">
-          <item.icon className="h-4 w-4" />
-          {item.badge > 0 && (
-            <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
-              {item.badge}
-            </span>
-          )}
-        </span>
-        {!collapsed && <span>{item.title}</span>}
-      </NavLink>
-    );
-
-    if (collapsed) {
-      return (
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>{link}</TooltipTrigger>
-          <TooltipContent side="right" className="text-xs">{item.title}</TooltipContent>
-        </Tooltip>
-      );
-    }
-    return link;
-  };
-
-  const SidebarContent = () => (
-    <div className="flex h-full flex-col">
-      <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-4">
-        <div className="flex h-9 w-auto shrink-0 items-center justify-center rounded-lg bg-sidebar-transparent">
-          <ImageRenderer src={logoIcon} alt="Logo" className={cn("h-8 w-8", !collapsed && "h-8 w-auto")} />
-        </div>
-      </div>
-      <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4" role="navigation" aria-label="Main navigation">
-        {visibleNav.map((item) => <NavItem key={item.url} item={item} />)}
-      </nav>
-      <div className="border-t border-sidebar-border p-2">
-        {collapsed ? (
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <button onClick={handleLogout} className="flex w-full items-center justify-center rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                <LogOut className="h-4 w-4 shrink-0" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="text-xs">Logout</TooltipContent>
-          </Tooltip>
-        ) : (
-          <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-            <LogOut className="h-4 w-4 shrink-0" /><span>Logout</span>
-          </button>
-        )}
-      </div>
-    </div>
-  );
 
   return (
     <div className="flex min-h-screen w-full bg-background">
@@ -143,7 +265,16 @@ const DashboardLayout = () => {
         collapsed ? "w-16" : "w-60",
         mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
       )}>
-        <SidebarContent />
+        <SidebarContent
+          collapsed={collapsed}
+          visibleNav={visibleNav}
+          user={user}
+          openSubmenus={openSubmenus}
+          location={location}
+          setMobileOpen={setMobileOpen}
+          toggleSubmenu={toggleSubmenu}
+          handleLogout={handleLogout}
+        />
         <button
           onClick={() => setCollapsed(!collapsed)}
           className="absolute -right-3 top-20 hidden h-6 w-6 items-center justify-center rounded-full border bg-card text-muted-foreground shadow-sm hover:text-foreground lg:flex"
@@ -235,7 +366,7 @@ const DashboardLayout = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </div >
   );
 };
 

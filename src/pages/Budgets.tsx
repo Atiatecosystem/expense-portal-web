@@ -53,8 +53,8 @@ const Budgets = () => {
 
       {/* KPI */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <StatsCard title="Total Budget" value={`SAR ${totalLimit.toLocaleString()}`} icon={<Wallet className="h-4 w-4" />} />
-        <StatsCard title="Total Spent" value={`SAR ${totalUsed.toLocaleString()}`} icon={<TrendingUp className="h-4 w-4" />} />
+        <StatsCard title="Total Budget" value={`₦ ${totalLimit.toLocaleString()}`} icon={<Wallet className="h-4 w-4" />} />
+        <StatsCard title="Total Spent" value={`₦ ${totalUsed.toLocaleString()}`} icon={<TrendingUp className="h-4 w-4" />} />
         <StatsCard title="Over Threshold" value={String(overThreshold)} icon={<AlertTriangle className="h-4 w-4" />} />
       </div>
 
@@ -123,7 +123,7 @@ const Budgets = () => {
 };
 
 const CreateBudgetForm = ({ onCreated }: { onCreated: (b: Budget) => void }) => {
-  const [form, setForm] = useState({ name: "", limit: "", period: BudgetPeriod.Monthly as BudgetPeriod, threshold: "80", currency: "SAR" });
+  const [form, setForm] = useState({ name: "", limit: "", period: BudgetPeriod.Monthly as BudgetPeriod, threshold: "80", currency: "NGN" });
   const [loading, setLoading] = useState(false);
 
   const handleCreate = async () => {
@@ -180,7 +180,7 @@ const CreateBudgetForm = ({ onCreated }: { onCreated: (b: Budget) => void }) => 
             <Select value={form.currency} onValueChange={(v) => setForm((f) => ({ ...f, currency: v }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="SAR">SAR</SelectItem>
+                <SelectItem value="NGN">NGN</SelectItem>
                 <SelectItem value="USD">USD</SelectItem>
                 <SelectItem value="EUR">EUR</SelectItem>
               </SelectContent>

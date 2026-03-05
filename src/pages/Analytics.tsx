@@ -58,7 +58,7 @@ const Analytics = () => {
 
       {/* KPI Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatsCard title="Total Volume" value={`SAR ${(312150).toLocaleString()}`} icon={<DollarSign className="h-4 w-4" />} />
+        <StatsCard title="Total Volume" value={`₦ ${(312150).toLocaleString()}`} icon={<DollarSign className="h-4 w-4" />} />
         <StatsCard title="Avg. Processing" value="2.4 days" icon={<Clock className="h-4 w-4" />} />
         <StatsCard title="Approval Rate" value="91%" icon={<TrendingUp className="h-4 w-4" />} />
         <StatsCard title="Rejection Rate" value="9%" icon={<XCircle className="h-4 w-4" />} />
@@ -66,7 +66,7 @@ const Analytics = () => {
 
       {/* Expense Trends + Processing Time */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <ChartCard title="Expense Trends" description="Monthly expense volume (SAR)">
+        <ChartCard title="Expense Trends" description="Monthly expense volume (NGN)">
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={monthlyRequestsData}>

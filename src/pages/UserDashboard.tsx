@@ -194,7 +194,7 @@ const UserDashboard = () => {
                                                 {format(new Date(req.date), "MMM d, yyyy")}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground text-sm py-4">
-                                                {req.currency === "NGN" ? "₦" : req.currency === "SAR" ? "ر.س " : "$"}
+                                                {req.currency === "NGN" ? "₦" : req.currency === "EUR" ? "€" : req.currency === "GBP" ? "£" : "$"}
                                                 {req.amount.toLocaleString()}
                                             </TableCell>
                                             <TableCell className="text-muted-foreground text-sm py-4">{stage}</TableCell>
